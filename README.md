@@ -207,10 +207,3 @@ TCP-scheduling jitter.
   by `compare.py`.
 - `presentation_results.log` (+ `.state.json`) — rolling slide-ready summary.
 
----
-
-## References
-
-- `FLonNonIIDviaRLnKnowledgeDistill.pdf` — underlying paper.
-- `presentation-content.md` — long-form discussion of the comparison results.
-- `Documents/FLAKE.pptx`, `Documents/FedAck.pptx` — accompanying slide decks.
