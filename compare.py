@@ -61,9 +61,7 @@ ROOT = Path(__file__).parent.resolve()
 STATE_SCHEMA = 3
 
 
-# ----------------------------------------------------------------------------
 # Model catalogs (must mirror MODEL_NAME_MAP inside layer_sharing.py / flake.py)
-# ----------------------------------------------------------------------------
 LS_MODELS = {
     1: "SimpleCNN",
     2: "SimpleCNN10",
@@ -92,9 +90,7 @@ CANONICAL_FK_MODEL = 2
 LS_TO_FK = {1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7}
 
 
-# ----------------------------------------------------------------------------
 # Child-process launcher
-# ----------------------------------------------------------------------------
 def _run_child(label: str, cmd: list[str], env_extra: dict,
                results_path: Path, log_path: Path) -> tuple[int, dict | None, float]:
     """Run a child framework process, capturing its stdout/stderr to ``log_path``
@@ -139,9 +135,7 @@ def _common_env(args) -> dict:
     }
 
 
-# ----------------------------------------------------------------------------
 # Per-round accuracy extraction from child stdout logs
-# ----------------------------------------------------------------------------
 _FLAKE_RE = re.compile(r"\[client (\d+)\] round (\d+):\s*acc=([\d.]+)%")
 _LAYER_SHARING_RE = re.compile(
     r"Client (\d+)\s*-\s*Round (\d+):\s*Accuracy:\s*([\d.]+)%"
@@ -170,9 +164,7 @@ def _rounds_to_target(history: list[tuple[int, float]], target: float):
     return None
 
 
-# ----------------------------------------------------------------------------
 # Row normalisation
-# ----------------------------------------------------------------------------
 def _row_for(result: dict | None, framework: str) -> dict:
     """Pull the comparable metrics out of a framework's JSON summary."""
     if result is None:
@@ -237,9 +229,7 @@ def _fmt_round(v) -> str:
     return "  -  "
 
 
-# ----------------------------------------------------------------------------
 # State file (incremental save / resume)
-# ----------------------------------------------------------------------------
 def _state_path_for(log_path: Path) -> Path:
     """Return the sidecar state file path for a given human-log path."""
     return log_path.with_suffix(log_path.suffix + ".state.json")
@@ -330,9 +320,7 @@ def _save_state(state_path: Path, args, sweep: dict,
     tmp.replace(state_path)
 
 
-# ----------------------------------------------------------------------------
 # Log-file writer
-# ----------------------------------------------------------------------------
 def _write_presentation_log(path: Path, args, sweep: dict,
                             targets: list[float]) -> None:
     """Rewrite the human-readable slide log from the in-memory sweep state.
@@ -582,9 +570,7 @@ def _write_sweep_section(w, framework: str, model_map: dict,
     w("\n")
 
 
-# ----------------------------------------------------------------------------
 # Scenario runner
-# ----------------------------------------------------------------------------
 def _run_framework_model(framework: str, model_id: int,
                          args, common_env: dict, input_path: Path) -> dict:
     """Execute a single ``(framework, model_id)`` run and return a dict with
@@ -666,9 +652,7 @@ def _run_sweep(args, inputs, common_env, sweep: dict, checkpoint) -> dict:
     return sweep
 
 
-# ----------------------------------------------------------------------------
 # Arg parsing helpers
-# ----------------------------------------------------------------------------
 def _parse_model_list(spec: str, allowed: set[int]) -> list[int]:
     """Parse a comma-separated model-id list, enforcing the ``allowed`` set."""
     if not spec:
@@ -708,9 +692,7 @@ def _print_lid_closed_hint() -> None:
     print("-" * 78 + "\n")
 
 
-# ----------------------------------------------------------------------------
 # Entry point
-# ----------------------------------------------------------------------------
 def main() -> int:
     """Parse args, load / init the sweep state, run any missing combos, and
     write the human-readable log + state file after every run."""

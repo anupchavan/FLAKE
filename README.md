@@ -1,4 +1,5 @@
-# Decentralised Federated Learning on CIFAR-10 — FLAKE vs. Layer Sharing
+# Federated learning with Asynchronous Non-IID Data & Knowledge Exchange
+
 
 Mini-project comparing two **serverless, peer-to-peer** federated-learning
 protocols on CIFAR-10 under a non-IID Dirichlet split:
@@ -206,4 +207,3 @@ TCP-scheduling jitter.
 - `<framework>_summary_m<id>.json` — machine-readable per-run summary consumed
   by `compare.py`.
 - `presentation_results.log` (+ `.state.json`) — rolling slide-ready summary.
-

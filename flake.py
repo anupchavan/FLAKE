@@ -94,9 +94,7 @@ SERVER_BACKLOG = int(os.environ.get("FED_SERVER_BACKLOG", "128"))
 CLIENT_BASE_PORT = int(os.environ.get("FLAKE_BASE_PORT", "8700"))
 
 
-# =============================================================================
 # Logging (console + file handler added in main() once model name is known)
-# =============================================================================
 logger = logging.getLogger("flake")
 logger.setLevel(logging.INFO)
 _formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -123,9 +121,7 @@ class _LoggerWriter:
 sys.stdout = _LoggerWriter(logger, logging.INFO)
 
 
-# =============================================================================
 # Input parsing
-# =============================================================================
 def parse_input_file(path: str = "flake_input.txt"):
     """Read ``N M``, the current machine's IP, and the list of N client IPs
     from the FLAKE input file. Returns ``(N, M, current_ip, ips)`` or all
@@ -157,9 +153,7 @@ if NUM_CLIENTS is None:
     sys.exit(1)
 
 
-# =============================================================================
 # Networking utilities: length-prefixed pickle messages over plain TCP.
-# =============================================================================
 def send_message(conn, message):
     """Pickle ``message`` and send it with a 4-byte big-endian length prefix."""
     data = pickle.dumps(message, protocol=pickle.HIGHEST_PROTOCOL)
@@ -200,10 +194,8 @@ def _new_socket():
     return sk
 
 
-# =============================================================================
 # Dataset -- CIFAR-10 with the same seeded Dirichlet non-IID partition used by
 # layer_sharing.py, so both frameworks see identical client-local data.
-# =============================================================================
 _transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
@@ -244,11 +236,9 @@ client_data = create_dirichlet_non_iid_splits_fixed(
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=128, shuffle=False)
 
 
-# =============================================================================
-# Model zoo. FLAKE is architecture-agnostic: KD is applied at the logit
+# FLAKE is architecture-agnostic: KD is applied at the logit
 # level and FedAvg at the state-dict level, so any CIFAR-10 classifier with
 # identical architecture across clients is a drop-in.
-# =============================================================================
 class PaperCNN(nn.Module):
     """Two 5x5 conv layers + 2x2 max-pool + two fully-connected layers."""
 
@@ -468,9 +458,7 @@ MODEL_NAME_MAP = {
 }
 
 
-# =============================================================================
 # State-dict helpers: pickle-friendly numpy dicts cross the wire between peers.
-# =============================================================================
 def state_dict_to_numpy(model: nn.Module):
     """Snapshot a model's state_dict as pure numpy (safe to pickle and send)."""
     return {k: v.detach().cpu().numpy() for k, v in model.state_dict().items()}
@@ -532,10 +520,8 @@ def compute_accuracy_and_f1(model, loader, num_classes: int = 10):
     return acc, float(np.mean(f1_per_class))
 
 
-# =============================================================================
 # Knowledge-distillation loss with the true-class column masked out of the
 # soft-label term (the hard CE term handles that column).
-# =============================================================================
 def kd_local_loss(student_logits, teacher_logits, targets, tau: float, mu: float):
     """Compute ``CE + mu * KL(student || teacher)``.
 
@@ -558,10 +544,8 @@ def kd_local_loss(student_logits, teacher_logits, targets, tau: float, mu: float
     return ce + mu * kl, ce.detach().item(), kl.detach().item()
 
 
-# =============================================================================
 # Per-client TCP listener: replies to ``weights_request`` messages with the
 # client's latest published weights and sample count.
-# =============================================================================
 def tcp_server(client_id: int, shared: dict, lock: threading.Lock,
                stop_event: threading.Event):
     """Serve this client's most recent weights to any peer that asks for them.
@@ -656,9 +640,7 @@ def request_peer_weights(requester_id: int, target_id: int, target_ip: str,
     return None
 
 
-# =============================================================================
 # Per-client training loop (runs in its own thread; NUM_CLIENTS of these per host).
-# =============================================================================
 def client_logic(client_id: int, model_choice: int, results_store: dict,
                  results_lock: threading.Lock,
                  initial_state_np: dict | None = None,
@@ -853,9 +835,7 @@ def client_logic(client_id: int, model_choice: int, results_store: dict,
         }
 
 
-# =============================================================================
 # Main entry point
-# =============================================================================
 def main():
     """Parse CLI args, spawn one thread per locally-hosted client, and write a
     summary (plus an optional JSON for ``compare.py``) when the run ends."""
