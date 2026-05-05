@@ -1,5 +1,4 @@
 """End-to-end comparison harness for Layer Sharing vs. FLAKE.
-
 Runs both scripts across a selectable set of CIFAR-10 architectures under
 identical hyperparameters, then writes a single presentation-ready log.
 The log is rewritten incrementally after every individual run, and a sidecar
